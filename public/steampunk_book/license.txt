@@ -1,0 +1,11 @@
+Model Information:
+* title:	Steampunk book
+* source:	https://sketchfab.com/3d-models/steampunk-book-670778920a1f48c5bd7900ad98a09a52
+* author:	TonyGeneralist (https://sketchfab.com/kamilot.2292)
+
+Model License:
+* license type:	CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)
+* requirements:	Author must be credited. No commercial use.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Steampunk book" (https://sketchfab.com/3d-models/steampunk-book-670778920a1f48c5bd7900ad98a09a52) by TonyGeneralist (https://sketchfab.com/kamilot.2292) licensed under CC-BY-NC-4.0 (http://creativecommons.org/licenses/by-nc/4.0/)

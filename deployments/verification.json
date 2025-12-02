@@ -1,0 +1,23 @@
+{
+  "network": "basecamp",
+  "chainId": 123420001114,
+  "timestamp": "2025-11-26T19:26:49.394Z",
+  "results": {
+    "ThesisRegistry": {
+      "address": "0x3B672951E3bF67b0A73E8716eC269bbAEe220550",
+      "verified": false
+    },
+    "RoyaltySplitter": {
+      "address": "0xee4744b079226cCCA53a22685a2252B56cE855C5",
+      "verified": false
+    },
+    "ForkTracker": {
+      "address": "0xA44fB44A1ed8119816AdBAf859f3675dfB186B84",
+      "verified": false
+    },
+    "UniversityValidator": {
+      "address": "0xB0999963147a7C1e1D6E74E3fdecC8eEfC628c35",
+      "verified": false
+    }
+  }
+}
