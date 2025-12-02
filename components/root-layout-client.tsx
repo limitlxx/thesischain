@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { CampProvider } from "@campnetwork/origin/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { AuthRedirect } from "@/components/auth-redirect"
+import { FixOriginProvider } from "@/lib/camp"
 
 const queryClient = new QueryClient()
 
@@ -44,6 +45,7 @@ export function RootLayoutClient({ children }: { children: ReactNode }) {
           environment="DEVELOPMENT"
           redirectUri={typeof window !== "undefined" ? window.location.origin : ""}
         >
+          <FixOriginProvider />
           <WalletProviderFix>
             <AuthRedirect />
             {children}

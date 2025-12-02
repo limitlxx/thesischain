@@ -4,6 +4,7 @@ import { useAuth, useProvider } from "@campnetwork/origin/react";
 import { createLicenseTerms } from "@campnetwork/origin";
 import { toast } from "sonner";
 import { zeroAddress } from "viem";
+import { useEffect } from "react";
 
 /**
  * Thesis metadata structure for IPFS
@@ -709,4 +710,108 @@ export function useClaimRoyalties(tokenId: bigint, walletAddress?: string) {
   return {
     claimRoyalties,
   };
+}
+
+/**
+ * Component to fix Origin SDK provider detection issues
+ * Works without wagmi - uses window.ethereum directly
+ * 
+ * Usage: Render this component inside CampProvider
+ */
+export function FixOriginProvider() {
+  const { setProvider } = useProvider();
+  const auth = useAuth();
+
+  // Set the provider on mount
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.ethereum) return;
+
+    const ethereum = (window as any).ethereum;
+    
+    // Handle multiple providers (MetaMask, Coinbase, etc.)
+    let selectedProvider = ethereum;
+    
+    if (ethereum.providers && Array.isArray(ethereum.providers)) {
+      console.log("🔍 Multiple wallet providers detected:", ethereum.providers.length);
+      
+      // Prefer MetaMask if available (exclude Brave and Coinbase)
+      const metaMask = ethereum.providers.find((p: any) => 
+        p.isMetaMask && !p.isBraveWallet && !p.isCoinbaseWallet
+      );
+      
+      if (metaMask) {
+        selectedProvider = metaMask;
+        console.log("✓ Selected MetaMask as provider");
+      } else {
+        selectedProvider = ethereum.providers[0];
+        console.log("✓ Selected first available provider");
+      }
+    }
+
+    // Set the provider for Origin SDK
+    const providerName = selectedProvider.isMetaMask ? "MetaMask" 
+      : selectedProvider.isCoinbaseWallet ? "Coinbase Wallet"
+      : selectedProvider.isTrust ? "Trust Wallet"
+      : "Wallet";
+
+    console.log("✓ Setting Origin provider to:", providerName);
+    
+    setProvider({
+      provider: selectedProvider,
+      info: { 
+        name: providerName,
+        icon: '',
+        uuid: providerName.toLowerCase().replace(/\s+/g, '-'),
+        rdns: providerName.toLowerCase().replace(/\s+/g, '-')
+      },
+    });
+  }, [setProvider]);
+
+  // Auto-reconnect Origin when wallet account changes
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.ethereum) return;
+
+    const handleAccountsChanged = async (accounts: string[]) => {
+      console.log("👛 Wallet accounts changed:", accounts);
+      
+      if (accounts.length === 0) {
+        console.log("❌ No accounts, disconnecting Origin...");
+        auth?.disconnect();
+      } else {
+        // Get current authenticated address from JWT
+        try {
+          const jwt = auth?.origin?.getJwt();
+          if (jwt) {
+            const payload = JSON.parse(atob(jwt.split(".")[1]));
+            const authenticatedAddress = payload.address?.toLowerCase();
+            const currentAddress = accounts[0].toLowerCase();
+            
+            if (authenticatedAddress && authenticatedAddress !== currentAddress) {
+              console.log("⚠️ Account mismatch detected!");
+              console.log("  Authenticated:", authenticatedAddress);
+              console.log("  Current:", currentAddress);
+              console.log("🔄 Reconnecting Origin...");
+              
+              auth?.disconnect();
+              setTimeout(() => {
+                console.log("🔌 Attempting to reconnect with new account...");
+                auth?.connect();
+              }, 500);
+            }
+          }
+        } catch (err) {
+          console.warn("Could not verify account match:", err);
+        }
+      }
+    };
+
+    const ethereum = (window as any).ethereum;
+    ethereum?.on?.("accountsChanged", handleAccountsChanged);
+
+    return () => {
+      ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
+    };
+  }, [auth]);
+
+  return null;
 }
