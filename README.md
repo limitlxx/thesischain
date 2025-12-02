@@ -80,8 +80,7 @@ ThesisChain Africa is a revolutionary platform that transforms academic research
   - Access control management
 
 #### 6. **Web3 Integration**
-- Camp Network Origin SDK integration
-- Wallet connection via Web3Modal
+- Camp Network Origin SDK integration 
 - MetaMask and WalletConnect support
 - Transaction signing and verification
 - Gas estimation and optimization
@@ -111,8 +110,7 @@ ThesisChain Africa is a revolutionary platform that transforms academic research
 - **Smart Contracts**: Solidity 0.8.24
 
 ### Database & Storage
-- **Database**: MongoDB Atlas
-- **File Storage**: IPFS via NFT.Storage
+- **Database**: MongoDB Atlas 
 - **Caching**: React Query
 
 ### Development Tools

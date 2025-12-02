@@ -82,7 +82,7 @@ Search → MongoDB (via API)
 
 **Connection String:**
 ```
-mongodb+srv://limitlxx:Damilola007@alpha.hcmtmfl.mongodb.net/?appName=Alpha
+mongodb+srv://[username]:[Password]@alpha.hcmtmfl.mongodb.net/?appName=Alpha
 ```
 
 **Database Name:** `thesischain`
