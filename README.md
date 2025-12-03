@@ -316,7 +316,7 @@ pnpm run verify
 pnpm run update-config
 ```
 
-See [DEPLOYMENT_SUMMARY.md](./DEPLOYMENT_SUMMARY.md) for detailed instructions.
+See [DEPLOYMENT_SUMMARY.md](./docs/DEPLOYMENT_SUMMARY.md) for detailed instructions.
 
 ## 🧪 Testing
 
@@ -412,21 +412,21 @@ pnpm test:watch
 
 ### Planned Features
 
-#### Short Term (1-2 months)
+#### Short Term
 - [ ] **PDF Viewer**: In-browser PDF rendering
 - [ ] **Comments & Discussions**: Thesis discussion threads
 - [ ] **Notifications**: Real-time activity notifications
 - [ ] **Email Integration**: Email alerts for important events
 - [ ] **Advanced Analytics**: More detailed statistics and charts
 
-#### Medium Term (3-6 months)
+#### Medium Term
 - [ ] **DAO Governance**: Community-driven platform decisions
 - [ ] **Grant System**: Funding for promising research
 - [ ] **Reputation System**: Researcher credibility scores
 - [ ] **Cross-Chain Support**: Bridge to other blockchains
 - [ ] **AI Integration**: AI-powered research recommendations
 
-#### Long Term (6-12 months)
+#### Long Term
 - [ ] **Mainnet Launch**: Deploy to Camp Network mainnet
 - [ ] **Token Launch**: Platform governance token
 - [ ] **University Partnerships**: Official university integrations
@@ -479,11 +479,11 @@ We welcome contributions from the community! Here's how you can help:
 
 ## 📚 Documentation
 
-- [Architecture Diagram](./ARCHITECTURE_DIAGRAM.md) - System architecture overview
-- [Deployment Guide](./DEPLOYMENT_SUMMARY.md) - Smart contract deployment
-- [Database Guide](./MONGODB_MIGRATION_COMPLETE.md) - Database setup and migration
-- [IPNFT Guide](./IPNFT_IMPLEMENTATION_COMPLETE.md) - IPNFT implementation details
-- [Testing Guide](./TESTING_GUIDE.md) - Testing strategies and examples
+- [Architecture Diagram](./docs/ARCHITECTURE_DIAGRAM.md) - System architecture overview
+- [Deployment Guide](./docs/DEPLOYMENT_SUMMARY.md) - Smart contract deployment
+- [Database Guide](./docs/MONGODB_MIGRATION_COMPLETE.md) - Database setup and migration
+- [IPNFT Guide](./docs/IPNFT_IMPLEMENTATION_COMPLETE.md) - IPNFT implementation details
+- [Testing Guide](./docs/TESTING_GUIDE.md) - Testing strategies and examples
 
 ## 🔐 Security
 
@@ -514,10 +514,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Community
 
-- **Website**: [thesischain.africa](https://thesischain.africa)
-- **Twitter**: [@ThesisChainAfrica](https://twitter.com/ThesisChainAfrica)
-- **Discord**: [Join our community](https://discord.gg/thesischain)
-- **Email**: support@thesischain.africa
+- **Website**: [thesischain.africa](https://thesischainafrica.vercel.app) 
+- **Email**: elgravicodesh@gmail.com
 
 ## 🌟 Star History
 
