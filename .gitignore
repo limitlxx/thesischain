@@ -31,7 +31,8 @@ yarn-error.log*
 
 # vercel
 .vercel
-.kiro/
+/.kiro/
+/.vscode/
 
 # typescript
 *.tsbuildinfo
@@ -44,3 +45,6 @@ typechain-types/
 
 # deployment
 deployments.json
+
+
+# Hardhat
