@@ -29,51 +29,29 @@ export function ThesisViewerOrigin({ thesisId }: { thesisId: string }) {
   const auth = useAuth()
   const { fetchIPNFT } = useFetchIPNFT()
   
-  // Load thesis from RxDB first, then fallback to blockchain
+  // Load thesis from MongoDB first, then fallback to blockchain
   useEffect(() => {
     async function loadThesis() {
       try {
         setIsLoading(true)
         setError(null)
         
-        // Try RxDB first (faster, offline-capable)
-        console.log("🔍 Checking RxDB for IPNFT:", thesisId)
+        // Try MongoDB first (faster, server-side)
+        console.log("🔍 Checking MongoDB for thesis:", thesisId)
         try {
-          const { getDatabase } = await import('@/lib/db/rxdb-setup')
-          const db = await getDatabase()
-          const doc = await db.theses.findOne(thesisId).exec()
-          
-          if (doc) {
-            const ipnft = doc.toJSON() as any
-            console.log("✅ IPNFT found in RxDB:", ipnft)
-            
-            setThesis({
-              tokenId: ipnft.tokenId,
-              owner: ipnft.owner,
-              author: ipnft.author,
-              name: ipnft.name,
-              description: ipnft.description,
-              university: ipnft.university,
-              department: ipnft.department,
-              year: ipnft.year,
-              royaltyBps: ipnft.royaltyBps,
-              imageUrl: ipnft.imageUrl,
-              ipfsHash: ipnft.ipfsHash,
-              fileName: ipnft.fileName,
-              fileType: ipnft.fileType,
-              fileSize: ipnft.fileSize,
-              forks: ipnft.forks,
-              parentTokenId: ipnft.parentTokenId,
-              mintedAt: ipnft.mintedAt,
-              mintedTimestamp: ipnft.mintedTimestamp,
-              updatedAt: ipnft.updatedAt
-            })
-            setDataSource('database')
-            setIsLoading(false)
-            return
+          const response = await fetch(`/api/theses?tokenId=${thesisId}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data) {
+              console.log("✅ Thesis found in MongoDB:", data)
+              setThesis(data)
+              setDataSource('database')
+              setIsLoading(false)
+              return
+            }
           }
         } catch (dbError) {
-          console.warn("⚠️ RxDB lookup failed, trying blockchain:", dbError)
+          console.warn("⚠️ MongoDB lookup failed, trying blockchain:", dbError)
         }
         
         // Fallback to blockchain if not in RxDB
