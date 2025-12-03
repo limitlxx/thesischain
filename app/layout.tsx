@@ -18,20 +18,24 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/thesischain_logo.jpg",
-        media: "(prefers-color-scheme: light)",
+        url: "/favicon.ico",
+        sizes: "any",
       },
       {
         url: "/thesischain_logo.jpg",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
+        sizes: "192x192",
+        type: "image/jpeg",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: "/thesischain_logo.jpg",
+    other: [
+      {
+        rel: "manifest",
+        url: "/site.webmanifest",
+      },
+    ],
   },
+  manifest: "/site.webmanifest",
 }
 
 export const viewport: Viewport = {

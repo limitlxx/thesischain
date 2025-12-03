@@ -2,6 +2,8 @@
 
 > On-Chain Final-Year Project & Research Registry with Built-In Royalties & Collaborative Improvement
 
+[![Mint your project here]](https://thesischainafrica.vercel.app/)
+
 #### Core Problem It Solves
 - 80%+ of final-year projects in African universities end up as PDF files on dusty shelves or Google Drive folders — zero visibility, zero reuse, zero credit to the student.
 - Lecturers and juniors constantly “reinvent the wheel” because there’s no discoverable index of past work.

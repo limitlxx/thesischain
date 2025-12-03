@@ -1,0 +1,21 @@
+{
+  "name": "ThesisChain Africa",
+  "short_name": "ThesisChain",
+  "description": "Decentralized Research Network for African Researchers",
+  "icons": [
+    {
+      "src": "/thesischain_logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/thesischain_logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "theme_color": "#0F172A",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "start_url": "/"
+}
