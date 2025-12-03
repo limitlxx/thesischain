@@ -6,9 +6,10 @@ import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table"
 import { LeaderboardTableSkeleton } from "@/components/leaderboard/leaderboard-table-skeleton"
 import { LeaderboardFilters } from "@/components/leaderboard/leaderboard-filters"
 import { Trophy, TrendingUp, Medal, Building2, GitFork } from "lucide-react"
-import { getAllTrackedIPNFTs, type TrackedIPNFT } from "@/lib/ipnft-tracker"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useAllIPNFTs } from "@/lib/db/hooks"
+import type { ThesisDocType } from "@/lib/db/types"
 
 interface ThesisRank {
   rank: number
@@ -150,70 +151,26 @@ import { Navbar } from "@/components/navbar"
 export default function LeaderboardPage() {
   const [filterCountry, setFilterCountry] = useState("")
   const [filterUniversity, setFilterUniversity] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [allTheses, setAllTheses] = useState<ThesisRank[]>([])
   const [filteredTheses, setFilteredTheses] = useState<ThesisRank[]>([])
   const [viewMode, setViewMode] = useState<"thesis" | "university">("thesis")
   const [universityRankings, setUniversityRankings] = useState<UniversityRank[]>([])
 
-  // Fetch all theses from localStorage on mount
-  useEffect(() => {
-    async function fetchLeaderboard() {
-      try {
-        setIsLoading(true)
+  // Fetch all IPNFTs from RxDB (global sync - all users' IPNFTs)
+  const { ipnfts: allIPNFTs, isLoading } = useAllIPNFTs()
 
-        // Get all tracked IPNFTs from localStorage
-        const trackedIPNFTs = getAllTrackedIPNFTs()
-        
-        if (trackedIPNFTs.length === 0) {
-          setAllTheses([])
-          setFilteredTheses([])
-          setIsLoading(false)
-          return
-        }
-
-        // Convert to ThesisRank format
-        const thesesData = trackedIPNFTs.map(convertIPNFTToThesisRank)
-
-        // Sort by earnings (descending) and assign ranks
-        thesesData.sort((a, b) => b.earnings - a.earnings)
-        thesesData.forEach((thesis, index) => {
-          thesis.rank = index + 1
-        })
-
-        setAllTheses(thesesData)
-        setFilteredTheses(thesesData)
-
-        // Calculate university rankings
-        calculateUniversityRankings(thesesData)
-      } catch (error) {
-        console.error("Error fetching leaderboard:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchLeaderboard()
-  }, [])
-
-  // Convert TrackedIPNFT to ThesisRank format
-  function convertIPNFTToThesisRank(ipnft: TrackedIPNFT): ThesisRank {
-    const getAttributeValue = (traitType: string) => {
-      const attr = ipnft.metadata.attributes.find(a => a.trait_type === traitType)
-      return attr?.value?.toString() || ""
-    }
-
+  // Convert ThesisDocType to ThesisRank format
+  function convertIPNFTToThesisRank(ipnft: ThesisDocType): ThesisRank {
     return {
       rank: 0, // Will be assigned after sorting
       id: ipnft.tokenId,
       title: ipnft.name,
-      author: ipnft.owner,
-      university: getAttributeValue("University") || "Unknown University",
+      author: ipnft.author || ipnft.owner,
+      university: ipnft.university,
       country: "Africa", // Default for now
       earnings: 0, // Would need to calculate from royalties
-      forks: parseInt(getAttributeValue("Forks")) || 0,
+      forks: ipnft.forks,
       citations: 0, // Not tracked yet
-      year: parseInt(getAttributeValue("Year")) || new Date().getFullYear(),
+      year: ipnft.year,
     }
   }
 
@@ -264,16 +221,35 @@ export default function LeaderboardPage() {
     setUniversityRankings(rankings)
   }
 
-  // Filter theses when filters change
+  // Process and filter theses when data or filters change
   useEffect(() => {
-    const filtered = allTheses.filter((thesis) => {
+    if (allIPNFTs.length === 0) {
+      setFilteredTheses([])
+      setUniversityRankings([])
+      return
+    }
+
+    // Convert to ThesisRank format
+    const thesesData = allIPNFTs.map(convertIPNFTToThesisRank)
+
+    // Sort by earnings (descending) and assign ranks
+    thesesData.sort((a, b) => b.earnings - a.earnings)
+    thesesData.forEach((thesis, index) => {
+      thesis.rank = index + 1
+    })
+
+    // Apply filters
+    const filtered = thesesData.filter((thesis) => {
       const countryMatch = !filterCountry || thesis.country === filterCountry
       const universityMatch = !filterUniversity || thesis.university === filterUniversity
       return countryMatch && universityMatch
     })
 
     setFilteredTheses(filtered)
-  }, [filterCountry, filterUniversity, allTheses])
+
+    // Calculate university rankings from all theses (not filtered)
+    calculateUniversityRankings(thesesData)
+  }, [filterCountry, filterUniversity, allIPNFTs])
 
   const handleFilterChange = (country: string, university: string) => {
     setFilterCountry(country)

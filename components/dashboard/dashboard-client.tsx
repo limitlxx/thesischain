@@ -36,8 +36,15 @@ export function DashboardClient() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Load user's IPNFTs from RxDB (with live updates)
+  // Load user's IPNFTs from MongoDB (with live updates)
   const { ipnfts: userIPNFTs, isLoading: isLoadingData } = useUserIPNFTs(walletAddress)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  // Manual refresh function
+  const refreshData = () => {
+    setRefreshKey(prev => prev + 1)
+    window.location.reload() // Force full reload to fetch fresh data
+  }
 
   // Fetch user earnings data
   const [earningsData, setEarningsData] = useState<any>(null)
@@ -122,15 +129,28 @@ export function DashboardClient() {
       <main className="flex-1 overflow-y-auto">
         <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">My Dashboard</h1>
-            <p className="mt-2 text-foreground/60">
-              {walletAddress ? (
-                <>Manage your IPNFTs and track your research impact</>
-              ) : (
-                <>Connect your wallet to view your dashboard</>
+          <div className="mb-8 flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">My Dashboard</h1>
+              <p className="mt-2 text-foreground/60">
+                {walletAddress ? (
+                  <>Manage your IPNFTs and track your research impact</>
+                ) : (
+                  <>Connect your wallet to view your dashboard</>
+                )}
+              </p>
+              {walletAddress && (
+                <p className="mt-1 text-xs text-muted-foreground font-mono">
+                  {walletAddress}
+                </p>
               )}
-            </p>
+            </div>
+            {walletAddress && (
+              <Button onClick={refreshData} variant="outline" size="sm">
+                <Loader2 className="mr-2 h-4 w-4" />
+                Refresh Data
+              </Button>
+            )}
           </div>
 
           {isLoadingWallet ? (

@@ -67,6 +67,8 @@ export function useUserIPNFTs(ownerAddress: string | null) {
         }
         
         const data = await response.json()
+        console.log("NFT DATA", data);
+        
         setIpnfts(data)
         setIsLoading(false)
       } catch (err) {

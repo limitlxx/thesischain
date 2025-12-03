@@ -330,37 +330,44 @@ export function useMintThesis() {
         const mintedAt = Date.now()
         const mintedTimestamp = new Date(mintedAt).toISOString()
 
+        const thesisData = {
+          tokenId: originTokenId,
+          owner: walletAddress.toLowerCase(),
+          author: String(author),
+          authorWallet: walletAddress.toLowerCase(),
+          name: enhancedMetadata.name,
+          description: enhancedMetadata.description,
+          university: String(university),
+          department: String(department),
+          year,
+          royaltyBps,
+          imageUrl: metadata.image || '',
+          ipfsHash: metadata.image?.replace('ipfs://', '') || '',
+          fileName: primaryFile.name,
+          fileType: primaryFile.type,
+          fileSize: primaryFile.size,
+          forks: 0,
+          parentTokenId: '',
+          mintedAt,
+          mintedTimestamp,
+          updatedAt: Date.now(),
+          isDeleted: false
+        }
+
+        console.log("📤 Sending thesis data to MongoDB:", thesisData);
+
         // Save to MongoDB via API
         const response = await fetch('/api/theses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tokenId: originTokenId,
-            owner: walletAddress.toLowerCase(),
-            author: String(author),
-            authorWallet: walletAddress.toLowerCase(),
-            name: enhancedMetadata.name,
-            description: enhancedMetadata.description,
-            university: String(university),
-            department: String(department),
-            year,
-            royaltyBps,
-            imageUrl: metadata.image || '',
-            ipfsHash: metadata.image?.replace('ipfs://', '') || '',
-            fileName: primaryFile.name,
-            fileType: primaryFile.type,
-            fileSize: primaryFile.size,
-            forks: 0,
-            parentTokenId: '',
-            mintedAt,
-            mintedTimestamp,
-            updatedAt: Date.now(),
-            isDeleted: false
-          })
+          body: JSON.stringify(thesisData)
         })
 
+        const responseData = await response.json()
+        console.log("📥 MongoDB API response:", { status: response.status, data: responseData });
+
         if (!response.ok) {
-          throw new Error('Failed to save thesis to database')
+          throw new Error(`Failed to save thesis to database: ${responseData.error || response.statusText}`)
         }
 
         console.log("✅ IPNFT successfully tracked in MongoDB");
@@ -369,8 +376,12 @@ export function useMintThesis() {
         });
       } catch (trackError) {
         console.error("❌ Failed to track IPNFT in MongoDB:", trackError);
+        console.error("Error details:", {
+          message: trackError instanceof Error ? trackError.message : String(trackError),
+          stack: trackError instanceof Error ? trackError.stack : undefined
+        });
         toast.error("Failed to save to database", {
-          description: "Your thesis was minted but not saved to the database",
+          description: trackError instanceof Error ? trackError.message : "Your thesis was minted but not saved to the database",
         });
       }
 

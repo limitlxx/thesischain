@@ -55,12 +55,20 @@ export async function POST(request: NextRequest) {
   try {
     const thesis: ThesisDocType = await request.json()
 
+    console.log('📝 Received thesis data:', {
+      tokenId: thesis.tokenId,
+      owner: thesis.owner,
+      name: thesis.name,
+      university: thesis.university
+    })
+
     const db = await getDatabase()
     const collection = db.collection<ThesisDocType>('theses')
 
     // Check if already exists
     const existing = await collection.findOne({ tokenId: thesis.tokenId })
     if (existing) {
+      console.log('⚠️ Thesis already exists:', thesis.tokenId)
       return NextResponse.json(
         { error: 'Thesis already exists' },
         { status: 409 }
@@ -68,13 +76,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert thesis
-    await collection.insertOne(thesis)
+    const result = await collection.insertOne(thesis)
+    console.log('✅ Thesis inserted successfully:', {
+      tokenId: thesis.tokenId,
+      insertedId: result.insertedId
+    })
 
     return NextResponse.json({ success: true, thesis })
   } catch (error) {
-    console.error('Error creating thesis:', error)
+    console.error('❌ Error creating thesis:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    })
     return NextResponse.json(
-      { error: 'Failed to create thesis' },
+      { error: error instanceof Error ? error.message : 'Failed to create thesis' },
       { status: 500 }
     )
   }

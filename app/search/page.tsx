@@ -56,11 +56,10 @@ export default function SearchPage() {
     }
   }
 
-  // Convert all IPNFTs to thesis format
-  const allTheses = allIPNFTs.map(convertIPNFTToThesis)
-
   // Filter and sort theses when search query or filters change
   useEffect(() => {
+    const allTheses = allIPNFTs.map(convertIPNFTToThesis)
+    
     const results = allTheses.filter((thesis) => {
       const matchesSearch =
         thesis.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -86,7 +85,7 @@ export default function SearchPage() {
     }
 
     setFilteredTheses(results)
-  }, [searchQuery, filters, allTheses])
+  }, [searchQuery, filters, allIPNFTs])
 
   // Infinite scroll observer
   useEffect(() => {
@@ -145,7 +144,7 @@ export default function SearchPage() {
               <>
                 <div className="flex items-center justify-between mb-6">
                   <p className="text-sm text-foreground/60">
-                    Showing {filteredTheses.length} of {allTheses.length} results
+                    Showing {filteredTheses.length} of {allIPNFTs.length} results
                   </p>
                 </div>
 
