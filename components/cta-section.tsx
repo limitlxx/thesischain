@@ -27,7 +27,7 @@ export function CTASection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {/* <w3m-button /> */}
             <Button variant="outline" asChild size="lg">
-              <Link href="#" className="flex items-center gap-2">
+              <Link href="/auth/signup" className="flex items-center gap-2">
                 Learn More
                 <ArrowRight className="h-4 w-4" />
               </Link>
