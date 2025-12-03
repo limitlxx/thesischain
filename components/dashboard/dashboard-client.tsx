@@ -39,24 +39,72 @@ export function DashboardClient() {
   // Load user's IPNFTs from RxDB (with live updates)
   const { ipnfts: userIPNFTs, isLoading: isLoadingData } = useUserIPNFTs(walletAddress)
 
-  // Convert ThesisDocType to thesis format for ThesisGrid
-  const userTheses = userIPNFTs.map(ipnft => ({
-    id: ipnft.tokenId,
-    title: ipnft.name,
-    university: ipnft.university,
-    totalEarnings: 0, // TODO: Calculate from blockchain events
-    forks: ipnft.forks,
-    thumbnail: ipnft.imageUrl || "/placeholder.svg",
-    earnings: 0,
-    description: ipnft.description,
-    royaltyBps: ipnft.royaltyBps,
-    mintedAt: ipnft.mintedAt,
-    author: ipnft.author
-  }))
+  // Fetch user earnings data
+  const [earningsData, setEarningsData] = useState<any>(null)
+  const [totalEarnings, setTotalEarnings] = useState(0)
 
-  const [pendingValidations] = useState([
-    // TODO: Fetch from blockchain events
-  ])
+  useEffect(() => {
+    if (!walletAddress) return
+
+    async function loadEarnings() {
+      try {
+        const response = await fetch(`/api/earnings?userAddress=${walletAddress?.toLowerCase() || ''}`)
+        if (response.ok) {
+          const data = await response.json()
+          setEarningsData(data)
+          setTotalEarnings(data.totalEarnings || 0)
+        }
+      } catch (error) {
+        console.error('Failed to load earnings:', error)
+      }
+    }
+
+    loadEarnings()
+  }, [walletAddress])
+
+  // Convert ThesisDocType to thesis format for ThesisGrid
+  const userTheses = userIPNFTs.map(ipnft => {
+    // Get earnings for this specific IPNFT from earnings data
+    const ipnftEarning = earningsData?.earningsByIPNFT?.find(
+      (e: any) => e.tokenId === ipnft.tokenId
+    )
+    const ipnftEarnings = ipnftEarning?.totalEarnings || 0
+
+    return {
+      id: ipnft.tokenId,
+      title: ipnft.name,
+      university: ipnft.university,
+      totalEarnings: ipnftEarnings,
+      forks: ipnft.forks,
+      thumbnail: ipnft.imageUrl || "/placeholder.svg",
+      earnings: ipnftEarnings,
+      description: ipnft.description,
+      royaltyBps: ipnft.royaltyBps,
+      mintedAt: ipnft.mintedAt,
+      author: ipnft.author
+    }
+  })
+
+  // Fetch pending validations from activities
+  const [pendingValidations, setPendingValidations] = useState<any[]>([])
+
+  useEffect(() => {
+    if (!walletAddress) return
+
+    async function loadValidations() {
+      try {
+        const response = await fetch(`/api/activities?userAddress=${walletAddress?.toLowerCase() || ''}&type=validated`)
+        if (response.ok) {
+          const validations = await response.json()
+          setPendingValidations(validations)
+        }
+      } catch (error) {
+        console.error('Failed to load validations:', error)
+      }
+    }
+
+    loadValidations()
+  }, [walletAddress])
 
   const hasTheses = userTheses.length > 0
 
@@ -173,7 +221,7 @@ export function DashboardClient() {
                       <Share2 className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">$0.00</div>
+                      <div className="text-2xl font-bold">${totalEarnings.toFixed(2)}</div>
                       <p className="text-xs text-muted-foreground">USDC earned</p>
                     </CardContent>
                   </Card>
@@ -253,7 +301,12 @@ export function DashboardClient() {
 
               {/* Analytics Tab */}
               <TabsContent value="analytics" className="space-y-6">
-                <AnalyticsView userIPNFTs={userIPNFTs} userTheses={userTheses} />
+                <AnalyticsView 
+                  userIPNFTs={userIPNFTs} 
+                  userTheses={userTheses}
+                  earningsData={earningsData}
+                  totalEarnings={totalEarnings}
+                />
               </TabsContent>
 
               {/* Settings Tab */}
@@ -287,7 +340,7 @@ function ActivityFeed({ walletAddress }: { walletAddress: string | null }) {
     async function loadActivities() {
       try {
         // Get user's activities from MongoDB via API
-        const response = await fetch(`/api/activities?userAddress=${walletAddress.toLowerCase()}`)
+        const response = await fetch(`/api/activities?userAddress=${walletAddress?.toLowerCase() || ''}`)
         if (!response.ok) throw new Error('Failed to fetch activities')
         
         const data = await response.json()
@@ -678,7 +731,17 @@ function IPNFTCard({ ipnft }: { ipnft: ThesisDocType }) {
  * Analytics View Component
  * Shows charts and statistics about user's IPNFTs
  */
-function AnalyticsView({ userIPNFTs, userTheses }: { userIPNFTs: ThesisDocType[], userTheses: any[] }) {
+function AnalyticsView({ 
+  userIPNFTs, 
+  userTheses, 
+  earningsData,
+  totalEarnings 
+}: { 
+  userIPNFTs: ThesisDocType[], 
+  userTheses: any[],
+  earningsData: any,
+  totalEarnings: number
+}) {
   // Calculate statistics
   const totalIPNFTs = userIPNFTs.length
   const totalForks = userTheses.reduce((sum, t) => sum + t.forks, 0)
@@ -700,6 +763,9 @@ function AnalyticsView({ userIPNFTs, userTheses }: { userIPNFTs: ThesisDocType[]
     return acc
   }, {} as Record<string, number>)
 
+  // Get earnings by month from earnings data
+  const earningsByMonth = earningsData?.earningsByMonth || {}
+
   return (
     <div className="space-y-6">
       <Card className="border-border/40">
@@ -708,7 +774,7 @@ function AnalyticsView({ userIPNFTs, userTheses }: { userIPNFTs: ThesisDocType[]
           <CardDescription>Overview of your research portfolio</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-4">
             <div>
               <div className="text-3xl font-bold">{totalIPNFTs}</div>
               <div className="text-sm text-muted-foreground">Total IPNFTs Minted</div>
@@ -720,6 +786,12 @@ function AnalyticsView({ userIPNFTs, userTheses }: { userIPNFTs: ThesisDocType[]
             <div>
               <div className="text-3xl font-bold">{avgRoyalty.toFixed(1)}%</div>
               <div className="text-sm text-muted-foreground">Average Royalty</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                ${totalEarnings.toFixed(2)}
+              </div>
+              <div className="text-sm text-muted-foreground">Total Earnings</div>
             </div>
           </div>
         </CardContent>
@@ -757,23 +829,99 @@ function AnalyticsView({ userIPNFTs, userTheses }: { userIPNFTs: ThesisDocType[]
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {Object.entries(byMonth).map(([month, count]) => (
-              <div key={month} className="flex items-center justify-between">
-                <span className="text-sm">{month}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-green-500"
-                      style={{ width: `${(count / totalIPNFTs) * 100}%` }}
-                    />
+            {Object.entries(byMonth).length > 0 ? (
+              Object.entries(byMonth).map(([month, count]) => (
+                <div key={month} className="flex items-center justify-between">
+                  <span className="text-sm">{month}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-green-500"
+                        style={{ width: `${(count / totalIPNFTs) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-medium w-8 text-right">{count}</span>
                   </div>
-                  <span className="text-sm font-medium w-8 text-right">{count}</span>
                 </div>
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground text-sm">
+                No minting activity yet
               </div>
-            ))}
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* Earnings by IPNFT */}
+      {earningsData?.earningsByIPNFT && earningsData.earningsByIPNFT.length > 0 && (
+        <Card className="border-border/40">
+          <CardHeader>
+            <CardTitle>Earnings by IPNFT</CardTitle>
+            <CardDescription>Revenue generated from each research paper</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {earningsData.earningsByIPNFT
+                .sort((a: any, b: any) => b.totalEarnings - a.totalEarnings)
+                .map((item: any) => (
+                  <div key={item.tokenId} className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm truncate block">{item.thesisName}</span>
+                      <span className="text-xs text-muted-foreground">{item.count} earnings</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-500"
+                          style={{ width: `${(item.totalEarnings / totalEarnings) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium w-16 text-right text-green-600 dark:text-green-400">
+                        ${item.totalEarnings.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Earnings Timeline */}
+      {Object.keys(earningsByMonth).length > 0 && (
+        <Card className="border-border/40">
+          <CardHeader>
+            <CardTitle>Earnings Timeline</CardTitle>
+            <CardDescription>Revenue earned over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Object.entries(earningsByMonth)
+                .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
+                .map(([month, amount]) => {
+                  const amountNum = typeof amount === 'number' ? amount : parseFloat(String(amount))
+                  return (
+                    <div key={month} className="flex items-center justify-between">
+                      <span className="text-sm">{month}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-purple-500"
+                            style={{ width: `${(amountNum / totalEarnings) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium w-16 text-right text-green-600 dark:text-green-400">
+                          ${amountNum.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
@@ -783,7 +931,13 @@ function AnalyticsView({ userIPNFTs, userTheses }: { userIPNFTs: ThesisDocType[]
  * Manage data and preferences
  */
 function SettingsView({ userIPNFTs }: { userIPNFTs: ThesisDocType[] }) {
-  const [stats, setStats] = useState({ count: 0, sizeMB: '0', maxCount: 1000 })
+  const [stats, setStats] = useState({ 
+    totalTheses: 0, 
+    totalActivities: 0,
+    totalProfiles: 0,
+    userIPNFTs: 0,
+    estimatedSizeMB: '0'
+  })
 
   useEffect(() => {
     async function loadStats() {
@@ -791,17 +945,27 @@ function SettingsView({ userIPNFTs }: { userIPNFTs: ThesisDocType[] }) {
         const response = await fetch('/api/stats')
         if (!response.ok) throw new Error('Failed to fetch stats')
         const data = await response.json()
+        
+        // Calculate estimated size (rough estimate based on document counts)
+        const estimatedSize = (
+          (data.theses || 0) * 0.05 + // ~50KB per thesis
+          (data.activities || 0) * 0.002 + // ~2KB per activity
+          (data.profiles || 0) * 0.01 // ~10KB per profile
+        ).toFixed(2)
+        
         setStats({
-          count: data.theses || 0,
-          sizeMB: '~' + ((data.theses || 0) * 0.01).toFixed(2), // Rough estimate
-          maxCount: 10000
+          totalTheses: data.theses || 0,
+          totalActivities: data.activities || 0,
+          totalProfiles: data.profiles || 0,
+          userIPNFTs: userIPNFTs.length,
+          estimatedSizeMB: estimatedSize
         })
       } catch (error) {
         console.error('Failed to load stats:', error)
       }
     }
     loadStats()
-  }, [])
+  }, [userIPNFTs.length])
 
   const handleExport = async () => {
     try {
@@ -828,22 +992,30 @@ function SettingsView({ userIPNFTs }: { userIPNFTs: ThesisDocType[] }) {
     <div className="space-y-6">
       <Card className="border-border/40">
         <CardHeader>
-          <CardTitle>Storage Information</CardTitle>
-          <CardDescription>Your local IPNFT data storage</CardDescription>
+          <CardTitle>Database Information</CardTitle>
+          <CardDescription>MongoDB storage statistics</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Total IPNFTs Stored</span>
-              <span className="font-medium">{stats.count}</span>
+              <span className="text-sm text-muted-foreground">Your IPNFTs</span>
+              <span className="font-medium">{stats.userIPNFTs}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Storage Size</span>
-              <span className="font-medium">{stats.sizeMB} MB</span>
+              <span className="text-sm text-muted-foreground">Total IPNFTs in Database</span>
+              <span className="font-medium">{stats.totalTheses}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Maximum Capacity</span>
-              <span className="font-medium">{stats.maxCount} IPNFTs</span>
+              <span className="text-sm text-muted-foreground">Total Activities</span>
+              <span className="font-medium">{stats.totalActivities}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Total Users</span>
+              <span className="font-medium">{stats.totalProfiles}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Estimated Database Size</span>
+              <span className="font-medium">~{stats.estimatedSizeMB} MB</span>
             </div>
           </div>
         </CardContent>
@@ -867,13 +1039,13 @@ function SettingsView({ userIPNFTs }: { userIPNFTs: ThesisDocType[] }) {
 
           <div className="pt-4 border-t">
             <p className="text-sm text-muted-foreground mb-4">
-              Note: This data is stored locally in your browser. For production use, consider:
+              Data is stored in MongoDB and synced across all users. Additional features:
             </p>
             <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-              <li>Backend database (PostgreSQL, MongoDB)</li>
-              <li>The Graph protocol subgraph</li>
-              <li>Camp Network's indexer API</li>
-              <li>IPFS pinning service</li>
+              <li>Real-time activity tracking</li>
+              <li>Earnings and royalty calculations</li>
+              <li>Leaderboard rankings</li>
+              <li>IPFS metadata storage</li>
             </ul>
           </div>
         </CardContent>

@@ -63,7 +63,7 @@ export function useWalletAddress() {
     }
   }, [auth?.origin])
 
-  console.log("useWalletAddress state:", { address, isChecking, hasAuth: !!auth, hasOrigin: !!auth?.origin })
+  // console.log("useWalletAddress state:", { address, isChecking, hasAuth: !!auth, hasOrigin: !!auth?.origin })
 
   return address
 }

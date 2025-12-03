@@ -35,22 +35,24 @@ Removed `onlyWagmi` prop (not needed without wagmi):
 
 ## Why This Works
 
-The Origin SDK has trouble detecting the correct wallet provider when:
-- Multiple wallet extensions are installed (MetaMask, Coinbase, Trust, etc.)
+The Origin SDK has trouble when:
 - User switches accounts after connecting
-- `window.ethereum` points to the wrong provider
+- JWT token doesn't match the active wallet
+- Multiple wallet extensions conflict
 
 `FixOriginProvider` solves this by:
-1. Explicitly setting the correct provider in Origin SDK on mount
-2. Preferring MetaMask when multiple providers exist
-3. Listening for account changes and reconnecting automatically
-4. Ensuring the JWT token matches the active wallet
+1. Listening for provider changes from Origin SDK
+2. Monitoring account changes and auto-reconnecting
+3. Ensuring the JWT token matches the active wallet
+4. Working with any wallet (MetaMask, Coinbase, WalletConnect, etc.)
 
 ## Testing
 
-1. Connect wallet → Should see: `✓ Setting Origin provider to: MetaMask`
-2. Switch accounts → Should auto-reconnect
-3. Mint thesis → Should succeed without signature errors
+1. **Connect wallet via CampModal** → Should connect successfully (works with any wallet)
+2. **Switch accounts** (if wallet installed) → Should auto-reconnect
+3. **Mint thesis** → Should succeed without signature errors
+
+**Note**: Works with browser wallets (MetaMask, Coinbase) and WalletConnect. No wallet extension required.
 
 ## Success Rate
 - **Before**: ~40% (random failures)

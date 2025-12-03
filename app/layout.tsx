@@ -14,15 +14,15 @@ export const metadata: Metadata = {
   description:
     "Empowering African researchers and developers through blockchain-based thesis collaboration on Camp Network",
   keywords: ["blockchain", "research", "Africa", "Web3", "Camp Network"],
-  generator: "v0.app",
+  generator: "elgravicodesh@gmail.com",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/thesischain_logo.jpg",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/thesischain_logo.jpg",
         media: "(prefers-color-scheme: dark)",
       },
       {

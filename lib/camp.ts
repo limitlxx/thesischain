@@ -203,7 +203,7 @@ export function useMintThesis() {
       const enhancedMetadata = {
         name: metadata.name,
         description: metadata.description,
-        ...(metadata.image && { image: metadata.image }), // Only include if provided
+        // ...(metadata.image && { image: metadata.image }), // Only include if provided
         attributes: [
           ...metadata.attributes,
           { trait_type: "File Count", value: files.length },
@@ -714,62 +714,39 @@ export function useClaimRoyalties(tokenId: bigint, walletAddress?: string) {
 
 /**
  * Component to fix Origin SDK provider detection issues
- * Works without wagmi - uses window.ethereum directly
+ * Syncs provider when user connects via CampModal
  * 
  * Usage: Render this component inside CampProvider
  */
 export function FixOriginProvider() {
-  const { setProvider } = useProvider();
   const auth = useAuth();
 
-  // Set the provider on mount
+  // Listen for provider changes from Origin SDK
   useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum) return;
+    if (!auth) return;
 
-    const ethereum = (window as any).ethereum;
-    
-    // Handle multiple providers (MetaMask, Coinbase, etc.)
-    let selectedProvider = ethereum;
-    
-    if (ethereum.providers && Array.isArray(ethereum.providers)) {
-      console.log("🔍 Multiple wallet providers detected:", ethereum.providers.length);
-      
-      // Prefer MetaMask if available (exclude Brave and Coinbase)
-      const metaMask = ethereum.providers.find((p: any) => 
-        p.isMetaMask && !p.isBraveWallet && !p.isCoinbaseWallet
-      );
-      
-      if (metaMask) {
-        selectedProvider = metaMask;
-        console.log("✓ Selected MetaMask as provider");
-      } else {
-        selectedProvider = ethereum.providers[0];
-        console.log("✓ Selected first available provider");
+    const handleProvider = (providerData: any) => {
+      if (providerData?.provider) {
+        console.log("✓ Origin provider set:", providerData.info?.name || "Unknown");
       }
-    }
+    };
 
-    // Set the provider for Origin SDK
-    const providerName = selectedProvider.isMetaMask ? "MetaMask" 
-      : selectedProvider.isCoinbaseWallet ? "Coinbase Wallet"
-      : selectedProvider.isTrust ? "Trust Wallet"
-      : "Wallet";
+    auth.on("provider", handleProvider);
 
-    console.log("✓ Setting Origin provider to:", providerName);
-    
-    setProvider({
-      provider: selectedProvider,
-      info: { 
-        name: providerName,
-        icon: '',
-        uuid: providerName.toLowerCase().replace(/\s+/g, '-'),
-        rdns: providerName.toLowerCase().replace(/\s+/g, '-')
-      },
-    });
-  }, [setProvider]);
+    return () => {
+      auth.off("provider", handleProvider);
+    };
+  }, [auth]);
 
-  // Auto-reconnect Origin when wallet account changes
+  // Auto-reconnect Origin when wallet account changes (if wallet exists)
   useEffect(() => {
-    if (typeof window === "undefined" || !window.ethereum) return;
+    if (typeof window === "undefined") return;
+    
+    const ethereum = (window as any).ethereum;
+    if (!ethereum) {
+      console.log("ℹ️ No wallet detected - user will connect via CampModal");
+      return;
+    }
 
     const handleAccountsChanged = async (accounts: string[]) => {
       console.log("👛 Wallet accounts changed:", accounts);
@@ -805,11 +782,10 @@ export function FixOriginProvider() {
       }
     };
 
-    const ethereum = (window as any).ethereum;
-    ethereum?.on?.("accountsChanged", handleAccountsChanged);
+    ethereum.on?.("accountsChanged", handleAccountsChanged);
 
     return () => {
-      ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
+      ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
     };
   }, [auth]);
 

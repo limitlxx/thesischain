@@ -1,6 +1,32 @@
 # ThesisChain Africa
 
-> A decentralized research network empowering African researchers through blockchain-based thesis collaboration and IP-NFT minting on Camp Network.
+> On-Chain Final-Year Project & Research Registry with Built-In Royalties & Collaborative Improvement
+
+#### Core Problem It Solves
+- 80%+ of final-year projects in African universities end up as PDF files on dusty shelves or Google Drive folders — zero visibility, zero reuse, zero credit to the student.
+- Lecturers and juniors constantly “reinvent the wheel” because there’s no discoverable index of past work.
+- Plagiarism and idea theft is rampant; students have no way to prove original authorship.
+- Talented students from less-known universities never get discovered by employers or diaspora investors.
+
+#### How ThesisChain Solves It Using Camp Network + Origin SDK
+
+| Feature | Implementation on Camp Network | Why It Wins Judges’ Hearts |
+| --- | --- | --- |
+| **Mint Your Thesis as Verifiable IP** | Student uploads PDF + code + short demo video → auto-minted as Origin-protected composable IP (metadata includes university, matric number, supervisor signature, graduation year) | Instant proof of originality & timestamp |
+| **Fractional Ownership + Improvement Forks** | Anyone (junior student, researcher, startup) can “fork & improve” the project by attaching new code/files → new version becomes a derivative IP that automatically pays 5–15% royalty to original author on every future use/download | Encourages collaboration instead of copying |
+| **Earn From Indexing & Citations** | Every time someone downloads, cites, or builds on your project → micro-payment in USDC/STRK (e.g. $0.10–$1) + loyalty points. Top 100 most-cited projects each semester get bonus grants from prize pool. | Passive income for students even after graduation |
+| **University Validation Layer** | Supervisors sign the mint transaction with their wallet (one-time university wallet setup) → only validated projects appear in “Official” gallery | Stops fake uploads, builds trust |
+| **Discoverability & Talent Scout Dashboard** | Fully on-chain searchable index (title, tags, department, impact score). Companies pay to access “Top Talent” filtered list (e.g. “Best 50 Computer Science projects in Nigeria 2025”) → revenue shared with students | Solves graduate unemployment |
+| **AI Agent Integration (Future Features)** | Camp Network AI agents can read the IP metadata and suggest improvements or auto-remix open-source code parts → agent creator also pays royalty split | Shows real use of Camp’s AI + IP vision |
+
+#### Revenue & Loyalty Model (Students Actually Earn)
+| Action | Earnings for Original Author |
+| --- | --- |
+| Someone downloads full project | $0.20–$1 (set by author) |
+| Someone forks & improves | 10% lifetime royalty on the fork’s future earnings |
+| Project ranks in monthly Top 20 | $100–$500 bonus from community treasury |
+| Corporate sponsor views your contact | $2–$5 (opt-in) |
+
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.0-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)

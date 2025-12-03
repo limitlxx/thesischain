@@ -162,7 +162,7 @@ export default function SignupPage() {
         </p>
 
         {/* Camp Modal for wallet connection */}
-        <CampModal injectButton={false} onlyWagmi={true}  />
+        <CampModal injectButton={false}  />
       </div>
     </div>
   )

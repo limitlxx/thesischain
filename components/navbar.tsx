@@ -41,9 +41,9 @@ export function Navbar() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-deep to-accent-warm">
+              {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-accent-deep to-accent-warm">
                 <span className="text-white text-sm font-bold">TC</span>
-              </div>
+              </div> */}
               <span className="bg-gradient-to-r from-accent-deep to-accent-warm bg-clip-text text-transparent">
                 ThesisChain.Africa
               </span>

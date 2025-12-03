@@ -15,6 +15,8 @@
     "verify": "hardhat run scripts/verify.js --network basecamp",
     "update-config": "node scripts/update-config.js",
     "seed": "node scripts/seed.js",
+    "populate-db": "node scripts/populate-mongodb.js",
+    "verify-db": "node scripts/verify-db.js",
     "full": "npm run deploy && npm run verify && npm run update-config && npm run seed",
     "forge:build": "forge build",
     "forge:test": "forge test -vvv"

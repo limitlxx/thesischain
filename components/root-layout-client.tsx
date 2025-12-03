@@ -16,18 +16,26 @@ function WalletProviderFix({ children }: { children: ReactNode }) {
     if (typeof window === "undefined") return;
     
     const ethereum = (window as any).ethereum;
-    if (ethereum?.providers && Array.isArray(ethereum.providers) && ethereum.providers.length > 1) {
-      console.log("🔧 Fixing multiple wallet providers...");
-      
-      // Find MetaMask (exclude Brave and Coinbase)
-      const metaMask = ethereum.providers.find((p: any) => 
-        p.isMetaMask && !p.isBraveWallet && !p.isCoinbaseWallet
-      );
-      
-      if (metaMask) {
-        console.log("✓ Setting window.ethereum to MetaMask");
-        (window as any).ethereum = metaMask;
+    
+    // Only log if wallet is detected
+    if (ethereum) {
+      if (ethereum.providers && Array.isArray(ethereum.providers) && ethereum.providers.length > 1) {
+        console.log("🔧 Multiple wallet providers detected:", ethereum.providers.length);
+        
+        // Find MetaMask (exclude Brave and Coinbase)
+        const metaMask = ethereum.providers.find((p: any) => 
+          p.isMetaMask && !p.isBraveWallet && !p.isCoinbaseWallet
+        );
+        
+        if (metaMask) {
+          console.log("✓ Setting window.ethereum to MetaMask");
+          (window as any).ethereum = metaMask;
+        }
+      } else {
+        console.log("✓ Wallet detected");
       }
+    } else {
+      console.log("ℹ️ No wallet extension detected - use CampModal to connect");
     }
   }, []);
   
@@ -46,11 +54,11 @@ export function RootLayoutClient({ children }: { children: ReactNode }) {
           redirectUri={typeof window !== "undefined" ? window.location.origin : ""}
         >
           <FixOriginProvider />
-          <WalletProviderFix>
+          {/* <WalletProviderFix> */}
             <AuthRedirect />
             {children}
             <Toaster />
-          </WalletProviderFix>
+          {/* </WalletProviderFix> */}
         </CampProvider>
       </QueryClientProvider>
     </ThemeProvider>

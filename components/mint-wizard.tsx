@@ -207,9 +207,9 @@ export function MintWizard() {
       setTimeout(() => setShowConfetti(false), 30000)
 
       // Redirect to thesis page after a short delay
-      setTimeout(() => {
-        router.push(`/thesis/${tokenId}`)
-      }, 30000)
+      // setTimeout(() => {
+      //   router.push(`/thesis/${tokenId}`)
+      // }, 30000)
 
     } catch (error) {
       console.error("Minting failed:", error)
