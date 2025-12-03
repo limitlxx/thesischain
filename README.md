@@ -12,14 +12,14 @@
 
 #### How ThesisChain Solves It Using Camp Network + Origin SDK
 
-| Feature | Implementation on Camp Network | Why It Wins Judges’ Hearts |
-| --- | --- | --- |
-| **Mint Your Thesis as Verifiable IP** | Student uploads PDF + code + short demo video → auto-minted as Origin-protected composable IP (metadata includes university, matric number, supervisor signature, graduation year) | Instant proof of originality & timestamp |
-| **Fractional Ownership + Improvement Forks** | Anyone (junior student, researcher, startup) can “fork & improve” the project by attaching new code/files → new version becomes a derivative IP that automatically pays 5–15% royalty to original author on every future use/download | Encourages collaboration instead of copying |
-| **Earn From Indexing & Citations** | Every time someone downloads, cites, or builds on your project → micro-payment in USDC/STRK (e.g. $0.10–$1) + loyalty points. Top 100 most-cited projects each semester get bonus grants from prize pool. | Passive income for students even after graduation |
-| **University Validation Layer** | Supervisors sign the mint transaction with their wallet (one-time university wallet setup) → only validated projects appear in “Official” gallery | Stops fake uploads, builds trust |
-| **Discoverability & Talent Scout Dashboard** | Fully on-chain searchable index (title, tags, department, impact score). Companies pay to access “Top Talent” filtered list (e.g. “Best 50 Computer Science projects in Nigeria 2025”) → revenue shared with students | Solves graduate unemployment |
-| **AI Agent Integration (Future Features)** | Camp Network AI agents can read the IP metadata and suggest improvements or auto-remix open-source code parts → agent creator also pays royalty split | Shows real use of Camp’s AI + IP vision |
+| Feature | Implementation on Camp Network |
+| --- | --- |
+| **Mint Your Thesis as Verifiable IP** | Student uploads PDF + code + short demo video → auto-minted as Origin-protected composable IP (metadata includes university, matric number, supervisor signature, graduation year) |
+| **Fractional Ownership + Improvement Forks** | Anyone (junior student, researcher, startup) can “fork & improve” the project by attaching new code/files → new version becomes a derivative IP that automatically pays 5–15% royalty to original author on every future use/download |
+| **Earn From Indexing & Citations** | Every time someone downloads, cites, or builds on your project → micro-payment in USDC/STRK (e.g. $0.10–$1) + loyalty points. Top 100 most-cited projects each semester get bonus grants from prize pool. |
+| **University Validation Layer** | Supervisors sign the mint transaction with their wallet (one-time university wallet setup) → only validated projects appear in “Official” gallery |
+| **Discoverability & Talent Scout Dashboard** | Fully on-chain searchable index (title, tags, department, impact score). Companies pay to access “Top Talent” filtered list (e.g. “Best 50 Computer Science projects in Nigeria 2025”) → revenue shared with students |
+| **AI Agent Integration (Future Features)** | Camp Network AI agents can read the IP metadata and suggest improvements or auto-remix open-source code parts → agent creator also pays royalty split |
 
 #### Revenue & Loyalty Model (Students Actually Earn)
 | Action | Earnings for Original Author |

@@ -303,7 +303,24 @@ export function useMintThesis() {
           message: mintError.message,
           stack: mintError.stack,
           response: mintError.response,
+          data: mintError.data,
+          cause: mintError.cause,
+          // Log the full error object
+          fullError: JSON.stringify(mintError, Object.getOwnPropertyNames(mintError), 2)
         });
+        
+        // Try to extract more details from the error
+        if (mintError.response) {
+          console.error("Response data:", mintError.response.data);
+          console.error("Response status:", mintError.response.status);
+          console.error("Response headers:", mintError.response.headers);
+        }
+        
+        // Check if it's a fetch error with response body
+        if (mintError instanceof Error && mintError.message.includes("similarity check")) {
+          console.error("⚠️ File similarity check failed - this file may be too similar to an existing file");
+        }
+        
         throw mintError;
       }
 
@@ -413,6 +430,13 @@ export function useMintThesis() {
 
         // Check for common error patterns
         if (
+          errorMessage.includes("similarity check") ||
+          errorMessage.includes("file similarity")
+        ) {
+          errorMessage = "File Similarity Check Failed";
+          errorDescription =
+            "This file appears to be too similar to an existing file in the Origin network. Please ensure your file is unique or try a different file. This is an Origin SDK protection against duplicate content.";
+        } else if (
           errorMessage.includes("Failed to get signature") ||
           errorMessage.includes("Failed to register")
         ) {
